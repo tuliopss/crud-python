@@ -15,6 +15,5 @@ def closeConn(conn, cursor):
     conn.close()
     
 
-def helloWorld():
-    print('oii')
+
 

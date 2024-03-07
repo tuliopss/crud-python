@@ -4,13 +4,17 @@ from db.config import openConn, closeConn
 def insertEmployee(name, email, role, salary):
     connection, cursor = openConn()
 
-    employee = ([ name, email, role, salary])
+    dicEemployee = {"name": name, "email": email, "role": role, "salary": salary}
+    employeesColumns = ', '.join(dicEemployee.keys())
+
     
-    query = f'INSERT INTO employees (name, email, role, salary) VALUES("{employee[0]}","{employee[1]}","{employee[2]}","{employee[3]}" )'
+    print(employeesColumns)
+    # query = f'INSERT INTO employees ({employeesColumns[0],}{employeesColumns[1],}{employeesColumns[2],}{employeesColumns[3],}) VALUES("{employeeValues[0]}","{employeeValues[1]}","{employeeValues[2]}","{employeeValues[3]}" )'
+    query = f'INSERT INTO employees ({employeesColumns}) VALUES("{dicEemployee['name']}","{dicEemployee['email']}","{dicEemployee['role']}","{dicEemployee['salary']}")'
     cursor.execute(query)
     connection.commit()
 
     closeConn(connection, cursor)
     print("registrado")
 
-insertEmployee("teste", "teste@email.com", "tester", 3000)
+insertEmployee("refac", "refac@email.com", "re", 4000)
