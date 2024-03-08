@@ -23,17 +23,28 @@ def employeeRepository():
         result = cursor.fetchall() 
 
         def readEmployees():
-            list(map(lambda emp: print(emp), result))
+            listaEmployees = []
+            list(map(lambda emp: listaEmployees.append(emp), result))
+            print(listaEmployees)
+
+            return listaEmployees
 
         readEmployees()
         closeConn(connection, cursor)
 
-    # def updateEmployee(id, emp):
-     
-        # dicEemployee = {"name": name, "email": email, "role": role, "salary": salary}
+    def getEmployeeById(id):
+        query = f'SELECT * FROM employees'
+        cursor.execute(query)
 
-        # queryUpdate = f'UPDATE books SET name = "{dicEemployee["name"]}", email ="{dicEemployee["email"]}", role = "{dicEemployee["role"]}", salary="{dicEemployee["salary"]}" WHERE id = ${id}'
-        # queryUpdate = f'UPDATE employees SET name = "{emp.name}", email ="{emp.email}", role = "{emp.role}", salary="{emp.salary}" WHERE id = ${id}'
+        result = cursor.fetchall()
+
+        def readEmployee():
+            employee = list(filter(lambda emp: emp[0] == id, result))
+            print(employee)
+        
+        readEmployee()
+        closeConn(connection, cursor)
+
 
     def deleteEmployee(id):
         query = f'DELETE FROM employees WHERE id={id}'
@@ -43,13 +54,15 @@ def employeeRepository():
         closeConn(connection,cursor)
         print('deletado')
 
-    return {"getEmployees": getEmployees, "insertEmployee": insertEmployee, 'deleteEmployee': deleteEmployee} #chatgpt
+    return {"getEmployees": getEmployees, "insertEmployee": insertEmployee, 'deleteEmployee': deleteEmployee, 'getEmployeeById': getEmployeeById} #chatgpt
 
 # insertEmployee("refac", "refac@email.com", "re", 4000)
 
 repository = employeeRepository()
 getEmployees = repository['getEmployees']   
+getEmployeeById = repository['getEmployeeById']   
 deleteEmployee = repository['deleteEmployee']    
 # getEmployees('employees')
 
-deleteEmployee(2)
+
+getEmployeeById(1)
