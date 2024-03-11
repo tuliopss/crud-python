@@ -17,8 +17,8 @@ def employeeRepository():
         closeConn(connection, cursor)
         print("registrado")
 
-    def getEmployees(table):
-        query = f'SELECT * FROM {table}'
+    def getEmployees():
+        query = f'SELECT * FROM employees'
 
         cursor.execute(query)
         result = cursor.fetchall() 
