@@ -1,9 +1,10 @@
 from db.config import openConn, closeConn
 from employeeHelpers import queryGetEmployeeById, checkIfEmployeeExist
 
-def employeeRepository():
+def employeeRepository(): #funcao de alta ordem
     connection, cursor = openConn()
 
+    #closures
     def insertEmployee(name, email, role, salary):
         # connection, cursor = openConn()
 
@@ -21,28 +22,25 @@ def employeeRepository():
         query = f'SELECT * FROM employees'
 
         cursor.execute(query)
-        result = cursor.fetchall() 
-
-        def readEmployees():
-            listaEmployees = []
-            list(map(lambda emp: listaEmployees.append(emp), result))
-            print(listaEmployees)
-
-            return listaEmployees
-
-        readEmployees()
-
+        listEmployees = cursor.fetchall() 
+        print(listEmployees)
         closeConn(connection, cursor)
+        return listEmployees
+        # def readEmployees():
+        #     listaEmployees = []
+        #     list(map(lambda emp: listaEmployees.append(emp), result))
+        #     print('read', listaEmployees)
+
+        #     return listaEmployees
+
+        # readEmployees()
 
     def getEmployeeById(id):
         employee = queryGetEmployeeById(id)
         checkIfEmployeeExist(employee)
-        def readEmployee(employee):
-          
-
-            if employee:
-                print(employee)
-        readEmployee(employee)
+        if employee:
+            print(employee)
+        
         closeConn(connection, cursor)    
 
     def deleteEmployee(id):
@@ -56,7 +54,22 @@ def employeeRepository():
             closeConn(connection,cursor)
             print('deletado')
 
-    return {"getEmployees": getEmployees, "insertEmployee": insertEmployee, 'deleteEmployee': deleteEmployee, 'getEmployeeById': getEmployeeById} #chatgpt
+    def searchEmployeesByRole(role):
+        query = f'SELECT * FROM employees'
+
+        cursor.execute(query)
+        listEmployees = cursor.fetchall() 
+
+        # list compreheension e lambda
+        listEmployeesByRole = lambda role : [emp for emp in listEmployees if emp[3].startswith(role) ]
+        print(listEmployeesByRole(role))
+        return listEmployeesByRole(role)
+
+    return {"getEmployees": getEmployees, 
+            "insertEmployee": insertEmployee,
+            'deleteEmployee': deleteEmployee, 
+            'getEmployeeById': getEmployeeById, 
+            'searchEmployeesByRole':searchEmployeesByRole} #chatgpt
 
 
 repository = employeeRepository()
@@ -64,9 +77,10 @@ getEmployees = repository['getEmployees']
 insertEmployee = repository['insertEmployee']
 getEmployeeById = repository['getEmployeeById']   
 deleteEmployee = repository['deleteEmployee']    
-
-# getEmployees('employees')
+searchEmployeesByRole = repository['searchEmployeesByRole']
+# getEmployees()
 # deleteEmployee(6)
-# insertEmployee("emp4", "emp2@email.com", "dev", 4000)
+# insertEmployee("julio", "julio@email.com", "test analysys", 4000)
 
-getEmployeeById(1)
+getEmployeeById(4)
+# searchEmployeesByRole('test')
