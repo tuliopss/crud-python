@@ -35,11 +35,12 @@ def employeeRepository(): #funcao de alta ordem
 
         # readEmployees()
 
-    def getEmployeeById(id):
+    def getEmployeeById(id, printCb):
         employee = queryGetEmployeeById(id)
         checkIfEmployeeExist(employee)
         if employee:
-            print(employee)
+            printCb(employee) #funcao continuacao / gpt
+       
         
         closeConn(connection, cursor)    
 
@@ -69,7 +70,9 @@ def employeeRepository(): #funcao de alta ordem
             "insertEmployee": insertEmployee,
             'deleteEmployee': deleteEmployee, 
             'getEmployeeById': getEmployeeById, 
-            'searchEmployeesByRole':searchEmployeesByRole} #chatgpt
+            'searchEmployeesByRole':searchEmployeesByRole,
+            }
+ #chatgpt
 
 
 repository = employeeRepository()
@@ -82,5 +85,5 @@ searchEmployeesByRole = repository['searchEmployeesByRole']
 # deleteEmployee(6)
 # insertEmployee("julio", "julio@email.com", "test analysys", 4000)
 
-getEmployeeById(4)
+getEmployeeById(4, lambda emp: print(emp) )
 # searchEmployeesByRole('test')

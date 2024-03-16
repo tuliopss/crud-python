@@ -13,7 +13,7 @@ def openConn():
 def closeConn(conn, cursor):
     cursor.close()
     conn.close()
-    
+
 
 
 
