@@ -63,7 +63,10 @@ def employeeRepository(): #funcao de alta ordem
 
         # list compreheension e lambda
         listEmployeesByRole = lambda role : [emp for emp in listEmployees if emp[3].startswith(role) ]
+        if(len(listEmployeesByRole(role)) == 0):
+           return print(f'Employees with role "{role}" not found')
         print(listEmployeesByRole(role))
+        
         return listEmployeesByRole(role)
 
     return {"getEmployees": getEmployees, 
@@ -85,5 +88,5 @@ searchEmployeesByRole = repository['searchEmployeesByRole']
 # deleteEmployee(6)
 # insertEmployee("julio", "julio@email.com", "test analysys", 4000)
 
-getEmployeeById(4, lambda emp: print(emp) )
+# getEmployeeById(4, lambda emp: print(emp) )
 # searchEmployeesByRole('test')
