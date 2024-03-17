@@ -11,7 +11,7 @@ def employeeRepository(): #funcao de alta ordem
         dicEemployee = {"name": name, "email": email, "role": role, "salary": salary}
         employeesColumns = ', '.join(dicEemployee.keys())
 
-        query = f'INSERT INTO employees ({employeesColumns}) VALUES("{dicEemployee['name']}","{dicEemployee['email']}","{dicEemployee['role']}","{dicEemployee['salary']}")'
+        query = f'INSERT INTO employees ({employeesColumns}) VALUES("{dicEemployee["name"]}","{dicEemployee["email"]}","{dicEemployee["role"]}","{dicEemployee["salary"]}")'
         cursor.execute(query)
         connection.commit()
 
