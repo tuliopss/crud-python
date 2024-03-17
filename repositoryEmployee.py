@@ -43,16 +43,18 @@ def employeeRepository():
 
         closeConn(connection, cursor)
 
-    def getEmployeeById(id):
-        connection, cursor = get_connection_and_cursor()
+        # Retornando a função getEmployees
+        return getEmployees
 
-        employee = queryGetEmployeeById(id)
+    def getEmployeeById(id, printCb):
+        connection, cursor = get_connection_and_cursor()
+        employee = queryGetEmployeeById(id)  # Aqui está o problema
         checkIfEmployeeExist(employee)
 
         def readEmployee(employee):
             if employee:
                 print("Employee found:")
-                print(employee)
+                printCb(employee)
                 print("\n")
             else:
                 print(f"Employee with ID {id} not found.")
@@ -61,32 +63,40 @@ def employeeRepository():
         closeConn(connection, cursor)
 
     def deleteEmployee(id):
-        connection, cursor = get_connection_and_cursor()
+        try:
+            connection, cursor = get_connection_and_cursor()
 
-        employee = queryGetEmployeeById(id)
-        checkIfEmployeeExist(employee)
+            employee = queryGetEmployeeById(id)  # Passar o ID como argumento
+            checkIfEmployeeExist(employee)
 
-        if employee:
-            query = f'DELETE FROM employees WHERE id={employee[0]}'
-            cursor.execute(query)
-            connection.commit()
+            if employee:
+                query = f'DELETE FROM employees WHERE id={id}'  # Usar o ID passado como argumento
+                cursor.execute(query)
+                connection.commit()
+                closeConn(connection, cursor)
+                print('Employee deleted')
+        except Exception as e:
+            print(f'Failed to delete employee: {e}')
+        finally:
             closeConn(connection, cursor)
-            print('Employee deleted')
-            
+
     def searchEmployeesByRole(role):
-        query = f'SELECT * FROM employees'
+        try:
+            connection, cursor = openConn()
+            query = f"SELECT * FROM employees WHERE role = '{role}'"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            if not result:
+                print(f'Employees with role "{role}" not found')
+            else:
+                for employee in result:
+                    print(employee)
+        except Exception as e:
+            print(f"Failed to search employees by role: {e}")
+        finally:
+            closeConn(connection, cursor)
 
-        cursor.execute(query)
-        listEmployees = cursor.fetchall() 
-
-        # list compreheension e lambda
-        listEmployeesByRole = lambda role : [emp for emp in listEmployees if emp[3].startswith(role) ]
-        if(len(listEmployeesByRole(role)) == 0):
-           return print(f'Employees with role "{role}" not found')
-        print(listEmployeesByRole(role))
-        
-        return listEmployeesByRole(role)
-
+    # Retornando todas as funções
     return {"getEmployees": getEmployees, 
             "insertEmployee": insertEmployee,
             'deleteEmployee': deleteEmployee, 
@@ -106,6 +116,10 @@ if repository:
     # deleteEmployee(6)
     # insertEmployee("emp4", "emp2@email.com", "dev", 4000)
 
-    getEmployeeById(1)
+    def printEmployee(employee):
+        print("Employee found:")
+        print(employee)
+
+    getEmployeeById(1, printEmployee)  # Passando a função de callback para printar o resultado
 else:
     print("Repository creation failed.")

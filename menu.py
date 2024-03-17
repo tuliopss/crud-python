@@ -1,7 +1,7 @@
 from repositoryEmployee import employeeRepository
 repository = employeeRepository()
 getEmployees = repository['getEmployees']
-from repositoryEmployee import employeeRepository
+
 
 def printMenu():
     print("Select an option: ")
@@ -46,8 +46,11 @@ def inputGetEmployeeById(callback):
     id = input('Enter the employee ID: ')
     if not id:
         return runOption()
-    printEmp = lambda emp: print(emp)
-    callback(id, printEmp)
+    callback(id, printEmp)  # A função de callback deve ser passada aqui
+
+def printEmp(emp):
+    print(emp)
+
 
 def inputGetEmployeeForRole(callback):
     role = input('Enter the employee role: ')
@@ -60,6 +63,7 @@ def inputDeleteEmployee(callback):
     if not id:
         return runOption()
     callback(id)
+
 
 printMenu()
 runOption()

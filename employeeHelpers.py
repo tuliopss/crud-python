@@ -1,8 +1,11 @@
 from db.config import openConn, closeConn
-connection, cursor = openConn()
+
+# Função para obter a conexão e o cursor
+def get_connection_and_cursor():
+    return openConn()
 
 def insertSampleEmployee():
-    connection, cursor = openConn()
+    connection, cursor = get_connection_and_cursor()
 
     dicEmployee = {"name": "Sample Employee", "email": "sample@email.com", "role": "Sample Role", "salary": 5000}
     employeesColumns = ', '.join(dicEmployee.keys())
@@ -18,19 +21,16 @@ def insertSampleEmployee():
 #insertSampleEmployee()
 
 def queryGetEmployeeById(id):
-        query = f'SELECT * FROM employees WHERE id={id}'
-        cursor.execute(query)
+    connection, cursor = get_connection_and_cursor()
+    query = f'SELECT * FROM employees WHERE id={id}'
+    cursor.execute(query)
+    employee = cursor.fetchone()
+    closeConn(connection, cursor)
+    return employee
 
-        employee = cursor.fetchone()
-
-        # employee = list(filter(lambda emp: emp[0] == id, result))
-        # checkIfEmployeeExist(employee)
-        closeConn(connection, cursor)
-        return employee
 
 def checkIfEmployeeExist(emp):
     if not emp:
-          print('Employee not found')
+        print('Employee not found')
     return emp
     # return emp if emp else print('a Employee not Found')
-
