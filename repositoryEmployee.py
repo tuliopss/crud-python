@@ -72,8 +72,27 @@ def employeeRepository():
             connection.commit()
             closeConn(connection, cursor)
             print('Employee deleted')
+            
+    def searchEmployeesByRole(role):
+        query = f'SELECT * FROM employees'
 
-    return {"getEmployees": getEmployees, "insertEmployee": insertEmployee, 'deleteEmployee': deleteEmployee, 'getEmployeeById': getEmployeeById}
+        cursor.execute(query)
+        listEmployees = cursor.fetchall() 
+
+        # list compreheension e lambda
+        listEmployeesByRole = lambda role : [emp for emp in listEmployees if emp[3].startswith(role) ]
+        if(len(listEmployeesByRole(role)) == 0):
+           return print(f'Employees with role "{role}" not found')
+        print(listEmployeesByRole(role))
+        
+        return listEmployeesByRole(role)
+
+    return {"getEmployees": getEmployees, 
+            "insertEmployee": insertEmployee,
+            'deleteEmployee': deleteEmployee, 
+            'getEmployeeById': getEmployeeById, 
+            'searchEmployeesByRole':searchEmployeesByRole,
+            }
 
 repository = employeeRepository()
 
