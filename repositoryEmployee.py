@@ -137,3 +137,4 @@ if repository:
     getEmployeeById(1, printEmployee)  # Passando a função de callback para printar o resultado
 else:
     print("Repository creation failed.")
+
