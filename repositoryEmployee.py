@@ -32,13 +32,11 @@ def employeeRepository():
 
         cursor.execute(query)
         result = cursor.fetchall()
-
+        
         def readEmployees():
             for employee in result:
-                print("Employee found:")
                 print(employee)
-                print("\n")
-
+                print("=================================================================\n")
         readEmployees()
 
         closeConn(connection, cursor)
@@ -61,12 +59,10 @@ def employeeRepository():
         checkIfEmployeeExist(employee)
 
         def readEmployee(employee):
-            if employee:
-                print("Employee found:")
-                printCb(employee)
-                print("\n")
-            else:
-                print(f"Employee with ID {id} not found.")
+            if employee:                
+             print("Employee found:")
+             printCb(employee)
+             print("=================================================================\n")
 
         readEmployee(employee)
         closeConn(connection, cursor)
@@ -117,23 +113,3 @@ def employeeRepository():
             'getEmployeeById': getEmployeeById, 
             'searchEmployeesByRole':searchEmployeesByRole,
             }
-
-repository = employeeRepository()
-
-if repository:
-    getEmployees = repository['getEmployees']
-    insertEmployee = repository['insertEmployee']
-    getEmployeeById = repository['getEmployeeById']
-    deleteEmployee = repository['deleteEmployee']
-
-    # getEmployees()
-    # deleteEmployee(6)
-    # insertEmployee("emp4", "emp2@email.com", "dev", 4000)
-
-    def printEmployee(employee):
-        print("Employee found:")
-        print(employee)
-
-    getEmployeeById(1, printEmployee)  # Passando a função de callback para printar o resultado
-else:
-    print("Repository creation failed.")

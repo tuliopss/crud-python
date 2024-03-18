@@ -26,7 +26,8 @@ def runOption():
         2: lambda: inputDeleteEmployee(deleteEmployee),
         3: lambda: inputGetEmployeeById(getEmployeeById),
         4: getEmployees,
-        5: lambda: inputGetEmployeeForRole(searchEmployeesByRole)
+        5: lambda: inputGetEmployeeForRole(searchEmployeesByRole),
+        6: exitProgram
     }
 
     fn = options.get(option)
@@ -34,6 +35,7 @@ def runOption():
         print('Invalid option')
     else:
         fn()
+        executeMenu()
 
 def inputInsertEmployee(callback):
     name = input("Enter employee name: ")
@@ -64,6 +66,10 @@ def inputDeleteEmployee(callback):
         return runOption()
     callback(id)
 
+def exitProgram():
+    print("Program closed.")
+    exit()
 
-printMenu()
-runOption()
+def executeMenu():
+    printMenu()
+    runOption()
