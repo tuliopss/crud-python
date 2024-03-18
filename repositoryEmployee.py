@@ -40,17 +40,7 @@ def employeeRepository():
         readEmployees()
 
         closeConn(connection, cursor)
-        # return listEmployees
-        # def readEmployees():
-        #     listaEmployees = []
-        #     list(map(lambda emp: listaEmployees.append(emp), result))
-        #     print('read', listaEmployees)
 
-        #     return listaEmployees
-
-        # readEmployees()
-
-        # Retornando a função getEmployees
         return getEmployees
 
     def getEmployeeById(id, printCb):
@@ -113,3 +103,4 @@ def employeeRepository():
             'getEmployeeById': getEmployeeById, 
             'searchEmployeesByRole':searchEmployeesByRole,
             }
+
