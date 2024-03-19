@@ -1,6 +1,5 @@
 from repositoryEmployee import employeeRepository
-repository = employeeRepository()
-getEmployees = repository['getEmployees']
+from employeeHelpers import checkIfEmployeeExist, queryGetEmployeeById
 
 
 def printMenu():
@@ -10,12 +9,14 @@ def printMenu():
     print("3 - Search a employee by id")
     print("4 - Show all employees")
     print("5 - Show employees for role")
-    print("6 - Exit")
+    print("6 - Edit employee")
+    print("7 - Exit")
 
 def runOption():
     repository = employeeRepository()
     getEmployees = repository['getEmployees']   
     insertEmployee = repository['insertEmployee']
+    editEmployee = repository['editEmployee']
     getEmployeeById = repository['getEmployeeById']   
     deleteEmployee = repository['deleteEmployee']    
     searchEmployeesByRole = repository['searchEmployeesByRole']
@@ -27,7 +28,9 @@ def runOption():
         3: lambda: inputGetEmployeeById(getEmployeeById),
         4: getEmployees,
         5: lambda: inputGetEmployeeForRole(searchEmployeesByRole),
-        6: exitProgram
+        6: lambda: inputEditEmployee(editEmployee),    
+        7: exitProgram,
+            
     }
 
     fn = options.get(option)
@@ -48,7 +51,21 @@ def inputGetEmployeeById(callback):
     id = input('Enter the employee ID: ')
     if not id:
         return runOption()
+    
     callback(id, printEmp)  # A função de callback deve ser passada aqui
+
+def inputEditEmployee(callback):
+     id = input('Enter the employee ID: ')
+     if not id:
+        return runOption()
+     employee = queryGetEmployeeById(id)
+     checkIfEmployeeExist(employee)
+     if employee: #Tive que fazer a verificacao pra acso o id nao seja encontrado, ja encerre aqui e nao depois dos inputs
+        updatedName = input("Enter the new name: ")
+        updatedRole = input("Enter the new role: ")
+        updatedSalary = input("Enter the new salary: ")
+        callback(id, updatedName, updatedRole, updatedSalary)
+
 
 def printEmp(emp):
     print(emp)

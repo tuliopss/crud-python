@@ -25,11 +25,40 @@ def employeeRepository():
         closeConn(connection, cursor)
         print("Employee registered")
 
+    def editEmployee(id, updatedName, updatedRole, updatedSalary):      
+        connection, cursor = get_connection_and_cursor()
+        employee = queryGetEmployeeById(id)
+        checkIfEmployeeExist(employee)
+
+        if employee:
+            dicEmployee = {"name": employee[1], "email": employee[2], "role": employee[3], "salary": employee[4]}
+            
+            if updatedName == "":
+                updatedName = dicEmployee['name']
+            
+            if updatedRole == "":
+                updatedRole = dicEmployee['role']
+            if updatedSalary == "":
+                updatedSalary = dicEmployee['salary'] 
+
+            dicEmployee['name'] = updatedName
+            dicEmployee['role'] = updatedRole
+            dicEmployee['salary'] = updatedSalary
+            
+
+            # query = f"UPDATE employees ({employeesColumns}) VALUES('{dicEmployee['name']}','{dicEmployee['email']}','{dicEmployee['role']}','{dicEmployee['salary']}')"
+            query = f"UPDATE employees SET name = '{updatedName}', role = '{updatedRole}', salary = '{updatedSalary}' WHERE id = {id}"
+
+            cursor.execute(query)
+            connection.commit()
+            closeConn(connection, cursor)
+            print('Employee edited')
+
+    
+        
     def getEmployees():
         connection, cursor = get_connection_and_cursor()
-
         query = f'SELECT * FROM employees'
-
         cursor.execute(query)
         result = cursor.fetchall()
         
@@ -40,7 +69,6 @@ def employeeRepository():
         readEmployees()
 
         closeConn(connection, cursor)
-
         return getEmployees
 
     def getEmployeeById(id, printCb):
@@ -102,5 +130,6 @@ def employeeRepository():
             'deleteEmployee': deleteEmployee, 
             'getEmployeeById': getEmployeeById, 
             'searchEmployeesByRole':searchEmployeesByRole,
+            'editEmployee': editEmployee
             }
 
