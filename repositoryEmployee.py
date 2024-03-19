@@ -1,5 +1,7 @@
 from db.config import openConn, closeConn
 from employeeHelpers import queryGetEmployeeById, checkIfEmployeeExist
+from resultMonad import ResultMonad
+
 
 # Função para obter a conexão e o cursor
 def get_connection_and_cursor():
@@ -13,17 +15,21 @@ def employeeRepository():
         return None
 
     def insertEmployee(name, email, role, salary):
-        connection, cursor = get_connection_and_cursor()
+        try:
+            connection, cursor = get_connection_and_cursor()
 
-        dicEmployee = {"name": name, "email": email, "role": role, "salary": salary}
-        employeesColumns = ', '.join(dicEmployee.keys())
+            dicEmployee = {"name": name, "email": email, "role": role, "salary": salary}
+            employeesColumns = ', '.join(dicEmployee.keys())
 
-        query = f"INSERT INTO employees ({employeesColumns}) VALUES('{dicEmployee['name']}','{dicEmployee['email']}','{dicEmployee['role']}','{dicEmployee['salary']}')"
-        cursor.execute(query)
-        connection.commit()
+            query = f"INSERT INTO employees ({employeesColumns}) VALUES('{dicEmployee['name']}','{dicEmployee['email']}','{dicEmployee['role']}','{dicEmployee['salary']}')"
+            cursor.execute(query)
+            connection.commit()
 
-        closeConn(connection, cursor)
-        print("Employee registered")
+            closeConn(connection, cursor)
+            print("Employee registered")
+            return ResultMonad("Employee registered")
+        except Exception as e:
+            return ResultMonad(str(e), success=False)
 
     def editEmployee(id, updatedName, updatedRole, updatedSalary):      
         connection, cursor = get_connection_and_cursor()
