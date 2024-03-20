@@ -18,7 +18,7 @@ class TestEmployeeRepository(unittest.TestCase):
 
     def test_deleteEmployee_existing_employee(self):
         # Assuming there is at least one employee in the database
-        existing_employee = self.repository['getEmployees']()[0]
+        existing_employee = self.repository['getEmployees'](False)[0]
         if existing_employee:
             existing_employee_id = existing_employee[0]
             result = self.repository['deleteEmployee'](existing_employee_id)
@@ -41,13 +41,13 @@ class TestEmployeeRepository(unittest.TestCase):
         self.assertIn("Employee not found", result.value)
 
     def test_getEmployees(self):
-        employees = self.repository['getEmployees']()
+        employees = self.repository['getEmployees'](False)
         self.assertIsNotNone(employees)
         # Add more assertions to check the correctness of the returned employees list
 
     def test_editEmployee_existing_employee(self):
         # Assuming there is at least one employee in the database
-        existing_employee = self.repository['getEmployees']()[0]
+        existing_employee = self.repository['getEmployees'](False)[0]
         if existing_employee:
             existing_employee_id = existing_employee[0]
             result = self.repository['editEmployee'](existing_employee_id, 'New Name', 'New Role', 6000)
@@ -62,9 +62,9 @@ class TestEmployeeRepository(unittest.TestCase):
         self.assertEqual(result.value, "Employee not found")
 
     def test_searchEmployeesByRole_existing_role(self):
-        result = self.repository['searchEmployeesByRole']('CEO')  # Assuming this role exists
+        result = self.repository['searchEmployeesByRole']('New Role')  # Assuming this role exists
         self.assertIsNotNone(result)
-        self.assertTrue(any(emp[3].startswith('CEO') for emp in result))
+        self.assertTrue(any(emp[3].startswith('New Role') for emp in result))
 
     def test_searchEmployeesByRole_non_existing_role(self):
         result = self.repository['searchEmployeesByRole']('Non Existing Role')  

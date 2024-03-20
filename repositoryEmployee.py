@@ -68,7 +68,7 @@ def employeeRepository():
         return ResultMonad("Employee not found", success=False)
 
 
-    def getEmployees():
+    def getEmployees(print_details=True):
         try:
             connection, cursor = get_connection_and_cursor()
             query = f'SELECT * FROM employees'
@@ -77,14 +77,17 @@ def employeeRepository():
             
             def readEmployees():
                 for employee in result:
-                    print(employee)
-                    print("=================================================================\n")
+                    if print_details:
+                        print(employee)
+                        print("=================================================================\n")
+
             readEmployees()
 
             closeConn(connection, cursor)
             return result
         except Exception as e:
             return ResultMonad(f'Failed to get employees: {e}', success=False)
+
 
 
     def getEmployeeById(id, printCb):
