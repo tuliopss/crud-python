@@ -2,8 +2,6 @@ from db.config import openConn, closeConn
 from employeeHelpers import queryGetEmployeeById, checkIfEmployeeExist
 from resultMonad import ResultMonad
 
-
-# Função para obter a conexão e o cursor
 def get_connection_and_cursor():
     return openConn()
 
@@ -16,9 +14,15 @@ def employeeRepository():
 
     def insertEmployee(name, email, role, salary):
         try:
+            if not name or not email or not role or float(salary) < 0:
+                return ResultMonad("Invalid data", success=False)
+        except ValueError:
+            return ResultMonad("Invalid salary", success=False)
+
+        try:
             connection, cursor = get_connection_and_cursor()
 
-            dicEmployee = {"name": name, "email": email, "role": role, "salary": salary}
+            dicEmployee = {"name": name, "email": email, "role": role, "salary": float(salary)}
             employeesColumns = ', '.join(dicEmployee.keys())
 
             query = f"INSERT INTO employees ({employeesColumns}) VALUES('{dicEmployee['name']}','{dicEmployee['email']}','{dicEmployee['role']}','{dicEmployee['salary']}')"
@@ -26,70 +30,73 @@ def employeeRepository():
             connection.commit()
 
             closeConn(connection, cursor)
-            print("Employee registered")
             return ResultMonad("Employee registered")
         except Exception as e:
             return ResultMonad(str(e), success=False)
 
+
     def editEmployee(id, updatedName, updatedRole, updatedSalary):      
-        connection, cursor = get_connection_and_cursor()
-        employee = queryGetEmployeeById(id)
-        checkIfEmployeeExist(employee)
+        try:
+            connection, cursor = get_connection_and_cursor()
+            employee = queryGetEmployeeById(id)
+            checkIfEmployeeExist(employee)
 
-        if employee:
-            dicEmployee = {"name": employee[1], "email": employee[2], "role": employee[3], "salary": employee[4]}
-            
-            if updatedName == "":
-                updatedName = dicEmployee['name']
-            
-            if updatedRole == "":
-                updatedRole = dicEmployee['role']
-            if updatedSalary == "":
-                updatedSalary = dicEmployee['salary'] 
+            if employee:
+                dicEmployee = {"name": employee[1], "email": employee[2], "role": employee[3], "salary": employee[4]}
+                
+                if updatedName == "":
+                    updatedName = dicEmployee['name']
+                
+                if updatedRole == "":
+                    updatedRole = dicEmployee['role']
+                if updatedSalary == "":
+                    updatedSalary = dicEmployee['salary'] 
 
-            dicEmployee['name'] = updatedName
-            dicEmployee['role'] = updatedRole
-            dicEmployee['salary'] = updatedSalary
-            
+                dicEmployee['name'] = updatedName
+                dicEmployee['role'] = updatedRole
+                dicEmployee['salary'] = updatedSalary
 
-            # query = f"UPDATE employees ({employeesColumns}) VALUES('{dicEmployee['name']}','{dicEmployee['email']}','{dicEmployee['role']}','{dicEmployee['salary']}')"
-            query = f"UPDATE employees SET name = '{updatedName}', role = '{updatedRole}', salary = '{updatedSalary}' WHERE id = {id}"
+                query = f"UPDATE employees SET name = '{updatedName}', role = '{updatedRole}', salary = '{updatedSalary}' WHERE id = {id}"
 
-            cursor.execute(query)
-            connection.commit()
-            closeConn(connection, cursor)
-            print('Employee edited')
+                cursor.execute(query)
+                connection.commit()
+                closeConn(connection, cursor)
+                return ResultMonad("Employee edited")
+        except Exception as e:
+            return ResultMonad(f'Failed to edit employee: {e}', success=False)
 
-    
-        
     def getEmployees():
-        connection, cursor = get_connection_and_cursor()
-        query = f'SELECT * FROM employees'
-        cursor.execute(query)
-        result = cursor.fetchall()
-        
-        def readEmployees():
-            for employee in result:
-                print(employee)
-                print("=================================================================\n")
-        readEmployees()
+        try:
+            connection, cursor = get_connection_and_cursor()
+            query = f'SELECT * FROM employees'
+            cursor.execute(query)
+            result = cursor.fetchall()
+            
+            def readEmployees():
+                for employee in result:
+                    print(employee)
+                    print("=================================================================\n")
+            readEmployees()
 
-        closeConn(connection, cursor)
-        return getEmployees
+            closeConn(connection, cursor)
+            return result
+        except Exception as e:
+            return ResultMonad(f'Failed to get employees: {e}', success=False)
+
 
     def getEmployeeById(id, printCb):
-        connection, cursor = get_connection_and_cursor()
-        employee = queryGetEmployeeById(id)  # Aqui está o problema
-        checkIfEmployeeExist(employee)
-
-        def readEmployee(employee):
-            if employee:                
-             print("Employee found:")
-             printCb(employee)
-             print("=================================================================\n")
-
-        readEmployee(employee)
-        closeConn(connection, cursor)
+        try:
+            connection, cursor = get_connection_and_cursor()
+            employee = queryGetEmployeeById(id)
+            checkIfEmployeeExist(employee)
+            closeConn(connection, cursor)
+            if employee:
+                printCb(employee)
+                return ResultMonad(employee)
+            else:
+                return ResultMonad("Employee not found", success=False)
+        except Exception as e:
+            return ResultMonad(f'Failed to get employee by ID: {e}', success=False)
 
     def deleteEmployee(id):
         try:
@@ -103,39 +110,45 @@ def employeeRepository():
                 cursor.execute(query)
                 connection.commit()
                 closeConn(connection, cursor)
-                print('Employee deleted')
+                return ResultMonad("Employee deleted")
         except Exception as e:
-            print(f'Failed to delete employee: {e}')
-        finally:
-            closeConn(connection, cursor)
+            return ResultMonad(f'Failed to delete employee: {e}', success=False)
 
     def searchEmployeesByRole(role):
         try:
+            if not role.strip():  # Verifica se o papel está vazio ou contém apenas espaços em branco
+                return ResultMonad("Role cannot be empty.", success=False)
+
             connection, cursor = openConn()
+            print("Connection established successfully.")
             query = f"SELECT * FROM employees"
             cursor.execute(query)
 
             listEmployees = cursor.fetchall()
 
-            listEmployeesByRole = lambda role : [emp for emp in listEmployees if emp[3].startswith(role) ]
+            print(f"Total employees: {len(listEmployees)}")
 
-            if(len(listEmployeesByRole(role)) == 0):
-                return print(f'Employees with role "{role}" not found')
+            filteredEmployees = list(filter(lambda emp: emp[3].startswith(role), listEmployees))
+
+            print(f"Filtered employees: {len(filteredEmployees)}")
+
+            if len(filteredEmployees) == 0:
+                return ResultMonad(f'Employees with role "{role}" not found', success=False)
             
-            print(listEmployeesByRole(role))
-        
-            return listEmployeesByRole(role)
+            return ResultMonad(filteredEmployees)
         except Exception as e:
-            print(f"Failed to search employees by role: {e}")
+            print(f"Exception occurred: {e}")
+            return ResultMonad(f"Failed to search employees by role: {e}", success=False)
         finally:
             closeConn(connection, cursor)
 
-    # Retornando todas as funções
-    return {"getEmployees": getEmployees, 
-            "insertEmployee": insertEmployee,
-            'deleteEmployee': deleteEmployee, 
-            'getEmployeeById': getEmployeeById, 
-            'searchEmployeesByRole':searchEmployeesByRole,
-            'editEmployee': editEmployee
-            }
 
+    # Retornando todas as funções
+    return {
+        "getEmployees": getEmployees, 
+        "insertEmployee": insertEmployee,
+        'deleteEmployee': deleteEmployee, 
+        'getEmployeeById': getEmployeeById, 
+        'searchEmployeesByRole': searchEmployeesByRole,
+        'editEmployee': editEmployee
+    }
