@@ -61,9 +61,12 @@ def employeeRepository():
                 cursor.execute(query)
                 connection.commit()
                 closeConn(connection, cursor)
-                return ResultMonad("Employee edited")
+                return ResultMonad("Employee edited", success=True)  # Definir success=True para operação bem-sucedida
         except Exception as e:
             return ResultMonad(f'Failed to edit employee: {e}', success=False)
+
+        return ResultMonad("Employee not found", success=False)
+
 
     def getEmployees():
         try:
@@ -110,35 +113,30 @@ def employeeRepository():
                 cursor.execute(query)
                 connection.commit()
                 closeConn(connection, cursor)
-                return ResultMonad("Employee deleted")
+                return ResultMonad("Employee deleted", success=True)  # Definir success=True para operação bem-sucedida
+            else:
+                return ResultMonad("Employee not found", success=False)
         except Exception as e:
             return ResultMonad(f'Failed to delete employee: {e}', success=False)
 
     def searchEmployeesByRole(role):
         try:
-            if not role.strip():  # Verifica se o papel está vazio ou contém apenas espaços em branco
-                return ResultMonad("Role cannot be empty.", success=False)
-
             connection, cursor = openConn()
-            print("Connection established successfully.")
             query = f"SELECT * FROM employees"
             cursor.execute(query)
 
             listEmployees = cursor.fetchall()
 
-            print(f"Total employees: {len(listEmployees)}")
+            listEmployeesByRole = lambda role : [emp for emp in listEmployees if emp[3].startswith(role) ]
 
-            filteredEmployees = list(filter(lambda emp: emp[3].startswith(role), listEmployees))
-
-            print(f"Filtered employees: {len(filteredEmployees)}")
-
-            if len(filteredEmployees) == 0:
-                return ResultMonad(f'Employees with role "{role}" not found', success=False)
+            if(len(listEmployeesByRole(role)) == 0):
+                return print(f'Employees with role "{role}" not found')
             
-            return ResultMonad(filteredEmployees)
+            print(listEmployeesByRole(role))
+        
+            return listEmployeesByRole(role)
         except Exception as e:
-            print(f"Exception occurred: {e}")
-            return ResultMonad(f"Failed to search employees by role: {e}", success=False)
+            print(f"Failed to search employees by role: {e}")
         finally:
             closeConn(connection, cursor)
 
